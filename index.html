@@ -1,12 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=
-    , initial-scale=1.0">
-    <title>UNDER MAINTENANCE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="web-title"></title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <p>V 1.0</p>
+
+    <!-- Modal / Layar Pembuka & Layar Countdown -->
+    <div id="entry-modal" class="modal-overlay">
+        <button id="lets-go-btn" class="big-btn hidden" onclick="enterSite()">
+            🚀 LET'S GO!
+        </button>
+
+        <div id="countdown-box" class="countdown-box hidden">
+            <p>Access locked. You already watched this.</p>
+            <p id="countdown-timer" class="countdown-timer">00:00:00</p>
+        </div>
+    </div>
+
+    <!-- Konten Utama (Centered) -->
+    <main id="main-content" class="hidden">
+        <p>Talking about Subnautica 1 Mod?</p>
+
+        <br>
+
+        <div class="scene">
+            <img src="saul.png" alt="Saul" id="saul-img" class="saul-img">
+        </div>
+
+        <br>
+
+        <p>Need your donation for buying new laptop, gotta need mod 3d modelling bruh.</p>
+
+        <!-- Tanpa atribut loop & tanpa tombol kontrol agar hanya play 1x -->
+        <audio id="bg-music" src="saul-music.mp3"></audio>
+    </main>
+
+    <script>
+        // Durasi kunci website dalam detik (contoh: 300 detik = 5 menit, 3600 = 1 jam)
+        const COOLDOWN_SECONDS = 30;
+        const COOKIE_NAME = "saul_unlock_time";
+
+        const modal = document.getElementById("entry-modal");
+        const letsGoBtn = document.getElementById("lets-go-btn");
+        const countdownBox = document.getElementById("countdown-box");
+        const countdownTimer = document.getElementById("countdown-timer");
+        const mainContent = document.getElementById("main-content");
+        const saulImg = document.getElementById("saul-img");
+        const audio = document.getElementById("bg-music");
+
+        let countdownInterval = null;
+
+        // --- Fungsi Helper Cookie ---
+        function setCookie(name, value, maxAgeSeconds) {
+            document.cookie = `${name}=${value}; max-age=${maxAgeSeconds}; path=/; SameSite=Lax`;
+        }
+
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+            return match ? match[2] : null;
+        }
+
+        // Format detik menjadi HH:MM:SS
+        function formatTime(totalSeconds) {
+            const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+            const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+            const secs = String(totalSeconds % 60).padStart(2, "0");
+            return `${hrs}:${mins}:${secs}`;
+        }
+
+        // Tampilkan modal countdown dan hitung mundur tiap detik
+        function showCountdown(unlockTimestamp) {
+            clearInterval(countdownInterval);
+
+            mainContent.classList.add("hidden");
+            letsGoBtn.classList.add("hidden");
+            countdownBox.classList.remove("hidden");
+
+            modal.style.display = "flex";
+            modal.classList.remove("fade-out");
+
+            function updateTimer() {
+                const remainingMs = unlockTimestamp - Date.now();
+                if (remainingMs <= 0) {
+                    clearInterval(countdownInterval);
+                    // Waktu habis: kembalikan tombol LET'S GO!
+                    countdownBox.classList.add("hidden");
+                    letsGoBtn.classList.remove("hidden");
+                    document.title = "";
+                } else {
+                    const remainingSec = Math.ceil(remainingMs / 1000);
+                    countdownTimer.innerText = formatTime(remainingSec);
+                }
+            }
+
+            updateTimer();
+            countdownInterval = setInterval(updateTimer, 1000);
+        }
+
+        // Cek status cookie saat halaman pertama kali dibuka / di-refresh
+        function checkAccess() {
+            const savedUnlockTime = Number(getCookie(COOKIE_NAME));
+            if (savedUnlockTime && savedUnlockTime > Date.now()) {
+                showCountdown(savedUnlockTime);
+            } else {
+                letsGoBtn.classList.remove("hidden");
+            }
+        }
+
+        // Fungsi efek ketik pada title
+        function typewritter(txt, speed, tout) {
+            setTimeout(() => {
+                let i = 0;
+                const intval = setInterval(() => {
+                    if (i < txt.length) {
+                        document.title += txt.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(intval);
+                    }
+                }, speed);
+            }, tout * 1000);
+        }
+
+        // Dijalankan saat tombol "LET'S GO!" diklik
+        function enterSite() {
+            // Cegah jika ternyata cookie masih aktif
+            const existingUnlock = Number(getCookie(COOKIE_NAME));
+            if (existingUnlock && existingUnlock > Date.now()) {
+                showCountdown(existingUnlock);
+                return;
+            }
+
+            // 1. Langsung simpan cookie waktu buka berikutnya (anti-refresh)
+            const unlockAt = Date.now() + COOLDOWN_SECONDS * 1000;
+            setCookie(COOKIE_NAME, unlockAt, COOLDOWN_SECONDS);
+
+            // 2. Putar musik 1x saja
+            audio.currentTime = 0;
+            audio.play();
+
+            // 3. Hilangkan modal & tampilkan konten web
+            modal.classList.add("fade-out");
+            mainContent.classList.remove("hidden");
+
+            // 4. Jalankan animasi buku berdiri pada gambar Saul
+            saulImg.classList.remove("animate-stand");
+            void saulImg.offsetWidth; // reset animasi
+            saulImg.classList.add("animate-stand");
+
+            // 5. Mulai efek ketik judul tab
+            document.title = "";
+            typewritter("Hola, bienvenido ✋🏻🗿", 150, 0.5);
+
+            setTimeout(() => {
+                if (!modal.classList.contains("fade-out")) return;
+                modal.style.display = "none";
+            }, 400);
+        }
+
+        // Begitu musik selesai 1x diputar, langsung kunci kembali web ke layar countdown
+        audio.addEventListener("ended", () => {
+            const unlockAt = Number(getCookie(COOKIE_NAME)) || (Date.now() + COOLDOWN_SECONDS * 1000);
+            showCountdown(unlockAt);
+        });
+
+        // Jalankan pengecekan cookie saat load
+        checkAccess();
+    </script>
 </body>
+
 </html>
