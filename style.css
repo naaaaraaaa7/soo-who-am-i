@@ -1,0 +1,124 @@
+* {
+    font-size: 1.2rem;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+}
+
+/* Gaya basic web klasik */
+body {
+    font-family: "Times New Roman", Times, serif;
+    margin: 40px 20px;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Semua konten utama di tengah layar */
+#main-content {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Modal layar penuh sebelum masuk web */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+}
+
+.modal-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Tombol besar gaya retro/basic */
+.big-btn {
+    font-family: "Times New Roman", Times, serif;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: bold;
+    padding: 24px 48px;
+    background-color: #efefef;
+    color: #000000;
+    border: 4px outset #888888;
+    cursor: pointer;
+    letter-spacing: 2px;
+}
+
+.big-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.big-btn:active {
+    border-style: inset;
+    transform: translateY(2px);
+}
+
+/* Tampilan kotak countdown */
+.countdown-box p {
+    font-family: "Times New Roman", Times, serif;
+    margin-bottom: 12px;
+}
+
+.countdown-timer {
+    font-family: "Times New Roman", Times, serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: bold;
+    letter-spacing: 3px;
+}
+
+/* Wadah perspektif 3D untuk efek buku berdiri */
+.scene {
+    perspective: 900px;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.saul-img {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    display: block;
+    transform-origin: bottom center;
+    opacity: 0;
+}
+
+/* Kelas animasi dipicu setelah modal ditutup */
+.saul-img.animate-stand {
+    animation: standUpBook 5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes standUpBook {
+    0% {
+        opacity: 0;
+        transform: rotateX(95deg);
+    }
+    70% {
+        opacity: 1;
+        transform: rotateX(-8deg);
+    }
+    100% {
+        opacity: 1;
+        transform: rotateX(0deg);
+    }
+}
